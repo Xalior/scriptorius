@@ -53,9 +53,10 @@
             attributes.align = "middle";
             attributes.scriptorPage = "./moodboard_example.png";
             swfobject.embedSWF(
-                "${swf}.swf", "flashContent", 
-                "${width}", "${height}", 
-                swfVersionStr, xiSwfUrlStr, 
+                "${swf}.swf", "flashContent",
+                //    "${width}", "${height}",
+                    "800", "600",
+                    swfVersionStr, xiSwfUrlStr,
                 flashvars, params, attributes);
             // JavaScript enabled so display the flashContent div in case it is not replaced with a swf object.
             swfobject.createCSS("#flashContent", "display:block;text-align:left;");

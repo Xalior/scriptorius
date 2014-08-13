@@ -9,12 +9,18 @@ import flash.geom.Rectangle;
 import flash.net.URLRequest;
 import flash.printing.PrintJob;
 
-import spark.primitives.Rect;
+import flash.external.ExternalInterface;
 
 public class Main extends Sprite {
         public function Main() {
             // once we're loaded, start the actual heavy lifting...
             this.loaderInfo.addEventListener(Event.COMPLETE, getImageName);
+        }
+
+
+        private function debug(str):void
+        {
+            ExternalInterface.call("console.log", str.toString());
         }
 
         private function getImageName(e:Event=null):void
@@ -54,7 +60,7 @@ public class Main extends Sprite {
         }
 
         private function printPrepare(bitmap:Bitmap=null):void {
-            var mc = new MovieClip();
+            var mc:MovieClip = new MovieClip();
             mc._width = bitmap.width;
             mc._height = bitmap.height;
             mc.cacheAsBitmap = true;
@@ -64,31 +70,39 @@ public class Main extends Sprite {
             var realW:Number = mc._width;
             var realH:Number = mc._height;
             var pj:PrintJob = new PrintJob();
-            var pageCount:Number = 0;
             if (pj.start()) {
                 mc._x = 0;
                 mc._y = 0;
                 var cXscale:Number, cYscale:Number;
                 if (pj.orientation.toLowerCase() != "landscape") {
-                    trace('portly');
+
+                    debug("portly");
+
                     mc._rotation = 90;
-                    mc._x = mc._width;
+//                    mc._x = mc._width;
                     cXscale = (pj.pageWidth / realH) * 100;
                     cYscale = (pj.pageHeight / realW) * 100;
                 }
                 else {
-                    trace('landy');
+                    debug("landy");
+
+
                     cXscale = (pj.pageWidth / realW) * 100;
                     cYscale = (pj.pageHeight / realH) * 100;
                 }
                 mc._xscale = mc._yscale = Math.min(cXscale, cYscale);
-                trace(realW); trace(realH);
+
+                stage.addChild(mc);
+                debug(realW);
+                debug(realH);
+
                 var pageRect:Rectangle = new Rectangle(0, 0, realW, realH);
-                if (pj.addPage(mc, pageRect)) pageCount++;
+                pj.addPage(mc, pageRect);
+
+                pj.send();
             } else {
                 trace('print terminated by user');
             }
-            if (pageCount > 0) pj.send();
         }
     }
 }
